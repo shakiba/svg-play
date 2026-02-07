@@ -1,4 +1,4 @@
-import { Mat33, Vec3 } from "planck-js";
+import { Mat33, Vec3 } from "planck";
 
 export default function mat33mul(A: Mat33, B: Mat33): Mat33 {
   const {

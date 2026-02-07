@@ -1,4 +1,4 @@
-import { Mat33 } from "planck-js";
+import { Mat33 } from "planck";
 import { mat33mul, mat33ToTransform, applyMat33ToShape } from ".";
 import { isShape } from "../util";
 

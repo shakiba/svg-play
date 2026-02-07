@@ -1,4 +1,4 @@
-import { Vec2, Vec3, Transform, Mat33 } from "planck-js";
+import { Vec2, Vec3, Transform, Mat33 } from "planck";
 import { getAngle } from "../util";
 import mat33mul from "./mat33mul";
 

@@ -1,4 +1,4 @@
-import { Mat33, Vec3 } from "planck-js";
+import { Mat33, Vec3 } from "planck";
 import parseNumberList from "./parseNumberList";
 
 export default function parseTransform(value: string): Mat33[] {

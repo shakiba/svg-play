@@ -1,9 +1,9 @@
-import { Mat33, Vec2, Vec3, Transform } from "planck-js";
+import { Mat33, Vec2, Vec3, Transform } from "planck";
 import { mat33mul, mat33ToTransform } from ".";
 import { PathSegment } from "../parsers/interpretPath";
 import { getAngle } from "../util";
 
-const EPSILON = 1e-3;
+const EPSILON = 1e-1;
 
 export default function applyMat33ToShape(node: any, A: Mat33 | null) {
   if (!A) {

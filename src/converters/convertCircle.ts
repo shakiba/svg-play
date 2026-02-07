@@ -1,9 +1,10 @@
-import { Circle, Transform, Vec2 } from "planck-js";
+import { Transform, Vec2 } from "planck";
+import { Factory } from "./factory";
 
-export default function (node: any, transform?: Transform): Circle[] {
+export default function (factory: Factory, node: any, transform?: Transform): void {
   let position = Vec2(node.$?.cx ?? 0, node.$?.cy ?? 0);
 
   position = [transform, node.$.transform, position].filter((a) => a).reduce(Transform.mul);
 
-  return [Circle(position, node.$?.r ?? 0)];
+  factory.circle(node, position, node.$?.r ?? 0);
 }

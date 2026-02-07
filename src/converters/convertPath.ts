@@ -1,4 +1,4 @@
-import { Edge, Chain, Transform, Vec2 } from "planck-js";
+import { Transform, Vec2 } from "planck";
 import {
   PathSegment,
   LineSegment,
@@ -6,16 +6,17 @@ import {
   QuadraticBezierCurveSegment,
   EllipticalArcCurveSegment,
 } from "../parsers/interpretPath";
+import { Factory } from "./factory";
 
 // TODO set ghost vertices
 
-export default function (node: any, transform?: Transform): (Edge | Chain)[] {
+export default function (factory: Factory, node: any, transform?: Transform): void {
   transform = (
     [transform, <Transform>node.$.transform, Transform.identity()].filter((a) => a) as Transform[]
   ).reduce(Transform.mul);
 
   if (!node.$?.d) {
-    return [];
+    return;
   }
   for (let segment of node.$.d as PathSegment[]) {
     segment.startingPoint = Transform.mul(transform, segment.startingPoint);
@@ -36,28 +37,33 @@ export default function (node: any, transform?: Transform): (Edge | Chain)[] {
     }
   }
 
-  return (<PathSegment[]>node.$.d).map((segment) => {
+  (<PathSegment[]>node.$.d).map((segment) => {
     switch (segment.type) {
       case "Line":
-        return convertLineSegment(segment);
+        return convertLineSegment(node, factory, segment);
       case "QuadraticBezierCurve":
-        return convertQuadraticBezierCurveSegment(segment);
+        return convertQuadraticBezierCurveSegment(node, factory, segment);
       case "CubicBezierCurve":
-        return convertCubicBezierCurveSegment(segment);
+        return convertCubicBezierCurveSegment(node, factory, segment);
       case "EllipticalArcCurve":
-        return convertEllipticalArcCurveSegment(segment);
+        return convertEllipticalArcCurveSegment(node, factory, segment);
     }
   });
 }
 
-function convertLineSegment(segment: LineSegment): Edge {
-  return Edge(segment.startingPoint, segment.endPoint);
+function convertLineSegment(node, factory: Factory, segment: LineSegment): void {
+  factory.edge(node, segment.startingPoint, segment.endPoint);
 }
 
-function convertQuadraticBezierCurveSegment(s: QuadraticBezierCurveSegment): Chain {
+function convertQuadraticBezierCurveSegment(
+  node,
+  factory: Factory,
+  s: QuadraticBezierCurveSegment,
+): void {
   const numberOfPoints = 7; // TODO as param
   // De-Casteljau-algorithm
-  return Chain(
+  factory.chain(
+    node,
     Array(numberOfPoints)
       .fill(0)
       .map((_, index) => index / (numberOfPoints - 1))
@@ -72,10 +78,11 @@ function convertQuadraticBezierCurveSegment(s: QuadraticBezierCurveSegment): Cha
   );
 }
 
-function convertCubicBezierCurveSegment(s: CubicBezierCurveSegment): Chain {
+function convertCubicBezierCurveSegment(node, factory: Factory, s: CubicBezierCurveSegment): void {
   const numberOfPoints = 7; // TODO as param
   // De-Casteljau-algorithm
-  return Chain(
+  factory.chain(
+    node,
     Array(numberOfPoints)
       .fill(0)
       .map((_, index) => index / (numberOfPoints - 1))
@@ -100,7 +107,11 @@ function convertCubicBezierCurveSegment(s: CubicBezierCurveSegment): Chain {
   );
 }
 
-function convertEllipticalArcCurveSegment(segment: EllipticalArcCurveSegment): Chain {
+function convertEllipticalArcCurveSegment(
+  node,
+  factory: Factory,
+  segment: EllipticalArcCurveSegment,
+): void {
   // TODO
-  return Chain([]);
+  factory.chain(node, []);
 }

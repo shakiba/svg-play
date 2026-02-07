@@ -1,5 +1,5 @@
 import { parseTransform } from "../parsers";
-import { Transform } from "planck-js";
+import { Transform } from "planck";
 
 export default function parseTransforms(value: string, name: string) {
   if (name !== "transform") {

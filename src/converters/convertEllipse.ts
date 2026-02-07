@@ -1,6 +1,7 @@
-import { Circle, Polygon, Transform, Vec2 } from "planck-js";
+import { Transform, Vec2 } from "planck";
+import { Factory } from "./factory";
 
-export default function (node: any, transform?: Transform): Polygon[] {
+export default function (factory: Factory, node: any, transform?: Transform): void {
   const numberOfPoints = 12; // TODO as param
 
   let position = Vec2(node.$?.cx ?? 0, node.$?.cy ?? 0);
@@ -20,5 +21,5 @@ export default function (node: any, transform?: Transform): Polygon[] {
     )
     .map((p) => Transform.mul(transformation, p));
 
-  return [Polygon(vertices)];
+  factory.polygon(node, vertices);
 }

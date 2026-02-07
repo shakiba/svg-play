@@ -1,4 +1,4 @@
-import { Mat33 } from "planck-js";
+import { Mat33 } from "planck";
 import mat33mul from "../mat33/mat33mul";
 
 export default function squashTransforms(value: Mat33[], name: string) {

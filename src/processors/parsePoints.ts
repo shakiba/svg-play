@@ -1,4 +1,4 @@
-import { Vec2 } from "planck-js";
+import { Vec2 } from "planck";
 import { parseNumberList } from "../parsers";
 
 export default function parsePoints(value: string, name: string) {
