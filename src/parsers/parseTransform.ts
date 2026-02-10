@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 import parseNumberList from "./parseNumberList";
 
 export default function parseTransform(value: string): geo.Mat33Value[] {

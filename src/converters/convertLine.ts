@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 import { Factory } from "./factory";
 
 export default function (factory: Factory, node: any, transform0?: geo.TransformValue): void {

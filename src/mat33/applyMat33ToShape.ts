@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 import { mat33mul, mat33ToTransform } from ".";
 import { PathSegment } from "../parsers/interpretPath";
 import { getAngle } from "../util";

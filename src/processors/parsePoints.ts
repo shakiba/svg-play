@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 import { parseNumberList } from "../parsers";
 
 export default function parsePoints(value: string, name: string) {

@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 import { Command } from "./parsePath";
 
 export type LineSegment = {

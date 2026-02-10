@@ -5,7 +5,7 @@ export * as converters from "./converters";
 
 export * from "./converters/factory";
 
-import * as geo from "./common/Geo";
+import * as geo from "./util/Geo";
 import { parseStringPromise, processors, OptionsV2 } from "xml2js";
 import {
   parseTransforms,

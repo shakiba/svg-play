@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 import { getAngle } from "../util";
 import mat33mul from "./mat33mul";
 

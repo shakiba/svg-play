@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 import { mat33mul, mat33ToTransform, applyMat33ToShape } from ".";
 import { isShape } from "../util";
 

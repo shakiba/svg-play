@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 
 export default function mat33mul(A: geo.Mat33Value, B: geo.Mat33Value): geo.Mat33Value {
   const {

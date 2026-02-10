@@ -1,4 +1,4 @@
-import * as geo from "../common/Geo";
+import * as geo from "../util/Geo";
 import { parseTransform } from "../parsers";
 
 export default function parseTransforms(value: string, name: string) {
