@@ -17,23 +17,20 @@ export default function (factory: Factory, node: any, transform0?: Transform): v
   if (transform0) geo.transformTransform(xf, xf, transform0);
   if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);
 
-  const transform = geo.transform(0, 0, 0);
-  geo.transformTransform(transform, xf, transform);
-
   if (!node.$?.d) {
     return;
   }
   for (let segment of node.$.d as PathSegment[]) {
-    geo.transformVec2(segment.startingPoint, transform, segment.startingPoint);
-    geo.transformVec2(segment.endPoint, transform, segment.endPoint);
+    geo.transformVec2(segment.startingPoint, xf, segment.startingPoint);
+    geo.transformVec2(segment.endPoint, xf, segment.endPoint);
 
     switch (segment.type) {
       case "CubicBezierCurve":
-        geo.transformVec2(segment.startControlPoint, transform, segment.startControlPoint);
-        geo.transformVec2(segment.endControlPoint, transform, segment.endControlPoint);
+        geo.transformVec2(segment.startControlPoint, xf, segment.startControlPoint);
+        geo.transformVec2(segment.endControlPoint, xf, segment.endControlPoint);
         break;
       case "QuadraticBezierCurve":
-        geo.transformVec2(segment.controlPoint, transform, segment.controlPoint);
+        geo.transformVec2(segment.controlPoint, xf, segment.controlPoint);
         break;
       case "EllipticalArcCurve":
         // TODO

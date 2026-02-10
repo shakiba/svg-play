@@ -2,17 +2,14 @@ import * as geo from "../util/Geo";
 import { Factory } from "./factory";
 
 export default function (factory: Factory, node: any, transform0?: geo.TransformValue): void {
-  const numberOfPoints = 12; // TODO as param
+  const numberOfPoints = 16; // TODO as param
 
   const xf = geo.transform(0, 0, 0);
   if (transform0) geo.transformTransform(xf, xf, transform0);
   if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);
 
-  const position = geo.vec2(node.$?.cx ?? 0, node.$?.cy ?? 0);
-  geo.transformVec2(position, xf, position);
-
-  const transformation = geo.transform(position.x, position.y, 0);
-  geo.transformTransform(transformation, xf, transformation);
+  const position = geo.transform(node.$?.cx ?? 0, node.$?.cy ?? 0, 0);
+  geo.transformTransform(position, xf, position);
 
   let vertices = Array(numberOfPoints)
     .fill(0)
@@ -24,7 +21,7 @@ export default function (factory: Factory, node: any, transform0?: geo.Transform
       ),
     )
     .map((p) => {
-      geo.transformVec2(p, transformation, p);
+      geo.transformVec2(p, position, p);
       return p;
     });
 
