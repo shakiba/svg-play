@@ -1,4 +1,4 @@
-import { Vec2 } from "planck";
+import * as geo from "../common/Geo";
 import { parseNumberList } from "../parsers";
 
 export default function parsePoints(value: string, name: string) {
@@ -6,10 +6,10 @@ export default function parsePoints(value: string, name: string) {
     return value;
   }
   const coordinates = parseNumberList(value);
-  const points = [] as Vec2[];
+  const points = [] as geo.Vec2Value[];
 
   for (let i = 1; i < coordinates.length; i += 2) {
-    points.push(Vec2(coordinates[i - 1], coordinates[i]));
+    points.push(geo.vec2(coordinates[i - 1], coordinates[i]));
   }
 
   return points;

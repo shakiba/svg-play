@@ -5,7 +5,7 @@ export * as converters from "./converters";
 
 export * from "./converters/factory";
 
-import { Mat33, Transform, Vec3 } from "planck";
+import * as geo from "./common/Geo";
 import { parseStringPromise, processors, OptionsV2 } from "xml2js";
 import {
   parseTransforms,
@@ -20,7 +20,7 @@ import { Factory, transformTree } from "./converters/factory";
 export type Options = {
   meterPerPixelRatio?: number;
   scaleY?: number;
-  transform?: Transform;
+  transform?: geo.TransformValue;
 } & Omit<
   Omit<Omit<Omit<OptionsV2, "attrkey">, "explicitChildren">, "preserveChildrenOrder">,
   "explicitRoot"
@@ -48,7 +48,7 @@ export async function svgFactory(svg: string, factory: Factory, options: Options
   const scaleY = options.scaleY ?? 1;
   const A =
     scale !== 1 || scaleY !== 1
-      ? new Mat33(Vec3(scale, 0, 0), Vec3(0, scale * scaleY, 0), Vec3(0, 0, 1))
+      ? { ex: geo.vec3(scale, 0, 0), ey: geo.vec3(0, scale * scaleY, 0), ez: geo.vec3(0, 0, 1) }
       : null;
 
   wringOutMat33(rootNode, A);

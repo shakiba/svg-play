@@ -1,11 +1,11 @@
-import { Mat33, Vec2, Vec3, Transform } from "planck";
+import * as geo from "../common/Geo";
 import { mat33mul, mat33ToTransform } from ".";
 import { PathSegment } from "../parsers/interpretPath";
 import { getAngle } from "../util";
 
 const EPSILON = 1e-1;
 
-export default function applyMat33ToShape(node: any, A: Mat33 | null) {
+export default function applyMat33ToShape(node: any, A: geo.Mat33Value | null) {
   if (!A) {
     return;
   }
@@ -29,7 +29,7 @@ export default function applyMat33ToShape(node: any, A: Mat33 | null) {
     case "polygon":
     case "polyline":
       if (node.$.points) {
-        node.$.points = node.$.points.map((point: Vec2) => {
+        node.$.points = node.$.points.map((point: geo.Vec2Value) => {
           return matt33mulVec2(overhang, point);
         });
       }
@@ -65,16 +65,17 @@ function rect2polygon(node: any) {
   const cy = (node.$.y ?? 0) + hy;
 
   node.$.points = [
-    Vec2(cx + hx, cy - hy),
-    Vec2(cx + hx, cy + hy),
-    Vec2(cx - hx, cy + hy),
-    Vec2(cx - hx, cy - hy),
+    geo.vec2(cx + hx, cy - hy),
+    geo.vec2(cx + hx, cy + hy),
+    geo.vec2(cx - hx, cy + hy),
+    geo.vec2(cx - hx, cy - hy),
   ];
 }
 
-function matt33mulVec2(A: Mat33, point: Vec2) {
-  const p = Mat33.mulVec3(A, Vec3(point.x, point.y, 1));
-  return Vec2(p.x, p.y);
+function matt33mulVec2(A: geo.Mat33Value, point: geo.Vec2Value) {
+  const p = geo.vec3(0, 0, 0);
+  geo.mulMat33Vec3(p, A, geo.vec3(point.x, point.y, 1));
+  return geo.vec2(p.x, p.y);
 }
 
 function circle2ellipse(node: any) {
@@ -84,18 +85,28 @@ function circle2ellipse(node: any) {
   node.$.ry = node.$.r;
 }
 
-function applyMat33ToEllipse(node: any, A: Mat33) {
+function applyMat33ToEllipse(node: any, A: geo.Mat33Value) {
   // see https://en.wikipedia.org/wiki/Ellipse#General_ellipse_2
 
-  const center = Mat33.mulVec3(A, Vec3(node.$.cx ?? 0, node.$.cy ?? 0, 1));
+  const center = geo.vec3(0, 0, 0);
+  geo.mulMat33Vec3(center, A, geo.vec3(node.$.cx ?? 0, node.$.cy ?? 0, 1));
 
-  A.ex.mul(node.$.rx ?? node.$.ry ?? 0);
-  A.ey.mul(node.$.ry ?? node.$.rx ?? 0);
+  geo.mulVec3(A.ex, node.$.rx ?? node.$.ry ?? 0);
+  geo.mulVec3(A.ey, node.$.ry ?? node.$.rx ?? 0);
 
-  const x = (2 * Vec3.dot(A.ex, A.ey)) / (Vec3.dot(A.ex, A.ex) - Vec3.dot(A.ey, A.ey));
+  const x = (2 * geo.dotVec3(A.ex, A.ey)) / (geo.dotVec3(A.ex, A.ex) - geo.dotVec3(A.ey, A.ey));
   const t_0 = Number.isNaN(x) ? 0 : Math.atan(x) / 2;
 
-  const p = (t: number) => Vec3.add(Vec3.mul(A.ex, Math.cos(t)), Vec3.mul(A.ey, Math.sin(t)));
+  const p = (t: number) => {
+    // todo: simplify this
+    const a = geo.vec3(A.ex.x, A.ex.y, A.ex.z);
+    geo.mulVec3(a, Math.cos(t));
+    const b = geo.vec3(A.ey.x, A.ey.y, A.ey.z);
+    geo.mulVec3(b, Math.sin(t));
+    const result = geo.vec3(0, 0, 0);
+    geo.addVec3(result, a, b);
+    return result;
+  };
 
   const verticeA = p(t_0);
   node.$.rx = Math.hypot(verticeA.x, verticeA.y);
@@ -107,7 +118,11 @@ function applyMat33ToEllipse(node: any, A: Mat33) {
   const alpha =
     length !== 0 ? getAngle(Math.acos(verticeA.x / length), Math.asin(verticeA.y / length)) : 0;
 
-  node.$.transform = Transform.mul(node.$.transform, Transform(Vec2(center.x, center.y), alpha));
+  geo.transformTransform(
+    node.$.transform,
+    node.$.transform,
+    geo.transform(center.x, center.y, alpha),
+  );
   node.$.cx = 0;
   node.$.cy = 0;
 }
@@ -119,9 +134,11 @@ function ellipse2circle(node: any) {
   }
 }
 
-function applyMat33ToLine(node: any, A: Mat33) {
-  const point1 = Mat33.mul(A, Vec2(node.$.x1 ?? 0, node.$.y1 ?? 0));
-  const point2 = Mat33.mul(A, Vec2(node.$.x2 ?? 0, node.$.y2 ?? 0));
+function applyMat33ToLine(node: any, A: geo.Mat33Value) {
+  const point1 = geo.vec3(0, 0, 0);
+  geo.mulMat33Vec3(point1, A, geo.vec3(node.$.x1 ?? 0, node.$.y1 ?? 0, 1));
+  const point2 = geo.vec3(0, 0, 0);
+  geo.mulMat33Vec3(point2, A, geo.vec3(node.$.x2 ?? 0, node.$.y2 ?? 0, 1));
 
   node.$.x1 = point1.x;
   node.$.y1 = point1.y;
@@ -129,7 +146,7 @@ function applyMat33ToLine(node: any, A: Mat33) {
   node.$.y2 = point2.y;
 }
 
-function applyMat33ToPath(node: any, A: Mat33) {
+function applyMat33ToPath(node: any, A: geo.Mat33Value) {
   if (!node.$.d) {
     return;
   }

@@ -1,12 +1,16 @@
-import { Transform, Vec2 } from "planck";
+import * as geo from "../common/Geo";
 import { Factory } from "./factory";
 
-export default function (factory: Factory, node: any, transform?: Transform): void {
-  let point1 = Vec2(node.$?.x1 ?? 0, node.$?.y1 ?? 0);
-  let point2 = Vec2(node.$?.x2 ?? 0, node.$?.y2 ?? 0);
+export default function (factory: Factory, node: any, transform0?: geo.TransformValue): void {
+  const xf = geo.transform(0, 0, 0);
+  if (transform0) geo.transformTransform(xf, xf, transform0);
+  if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);
 
-  point1 = [transform, node.$.transform, point1].filter((a) => a).reduce(Transform.mul);
-  point2 = [transform, node.$.transform, point2].filter((a) => a).reduce(Transform.mul);
+  let point1 = geo.vec2(node.$?.x1 ?? 0, node.$?.y1 ?? 0);
+  geo.transformVec2(point1, xf, point1);
+
+  let point2 = geo.vec2(node.$?.x2 ?? 0, node.$?.y2 ?? 0);
+  geo.transformVec2(point2, xf, point2);
 
   factory.edge(node, point1, point2);
 }

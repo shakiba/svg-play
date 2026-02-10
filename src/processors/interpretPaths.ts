@@ -6,7 +6,7 @@ export default function interpretPaths(value: any, name: string) {
   }
   try {
     return interpretPath(value);
-  } catch (e) {
+  } catch (e: any) {
     console.warn(e.message); // TODO ok?
     return [];
   }

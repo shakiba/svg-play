@@ -6,7 +6,7 @@ export default function parsePaths(value: string, name: string) {
   }
   try {
     return parsePath(value);
-  } catch (e) {
+  } catch (e: any) {
     console.warn(e.message); // TODO ok?
     return [];
   }

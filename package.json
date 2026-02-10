@@ -2,9 +2,12 @@
   "name": "svg-play",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "dist/svg-play.js",
   "scripts": {
-    "build": "tsc",
+    "dev": "vite",
+    "build": "vite build",
+    "watch": "vite build --watch",
     "pretest": "npm run build",
     "test": "mocha",
     "pretty": "prettier --write .",
@@ -15,16 +18,21 @@
   "author": "Oliver Zell",
   "license": "MIT",
   "dependencies": {
-    "@changesets/cli": "^2.29.8",
-    "planck": "^1.4.2",
-    "prettier": "^3.8.1",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@types/xml2js": "^0.4.14",
     "chai": "^4.2.0",
     "chai-almost": "^1.0.1",
+    "events": "^3.3.0",
     "mocha": "^8.1.3",
-    "typescript": "^5.9.3"
+    "prettier": "^3.8.1",
+    "stream-browserify": "^3.0.0",
+    "timers-browserify": "^2.0.12",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1",
+    "vite-plugin-dts-bundle-generator": "^2.1.2",
+    "vite-plugin-node-polyfills": "^0.25.0"
   }
 }

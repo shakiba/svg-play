@@ -1,4 +1,4 @@
-import { Transform, Vec2 } from "planck";
+import * as geo from "../common/Geo";
 import {
   PathSegment,
   LineSegment,
@@ -8,27 +8,32 @@ import {
 } from "../parsers/interpretPath";
 import { Factory } from "./factory";
 
+type Transform = geo.TransformValue;
+
 // TODO set ghost vertices
 
-export default function (factory: Factory, node: any, transform?: Transform): void {
-  transform = (
-    [transform, <Transform>node.$.transform, Transform.identity()].filter((a) => a) as Transform[]
-  ).reduce(Transform.mul);
+export default function (factory: Factory, node: any, transform0?: Transform): void {
+  const xf = geo.transform(0, 0, 0);
+  if (transform0) geo.transformTransform(xf, xf, transform0);
+  if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);
+
+  const transform = geo.transform(0, 0, 0);
+  geo.transformTransform(transform, xf, transform);
 
   if (!node.$?.d) {
     return;
   }
   for (let segment of node.$.d as PathSegment[]) {
-    segment.startingPoint = Transform.mul(transform, segment.startingPoint);
-    segment.endPoint = Transform.mul(transform, segment.endPoint);
+    geo.transformVec2(segment.startingPoint, transform, segment.startingPoint);
+    geo.transformVec2(segment.endPoint, transform, segment.endPoint);
 
     switch (segment.type) {
       case "CubicBezierCurve":
-        segment.startControlPoint = Transform.mul(transform, segment.startControlPoint);
-        segment.endControlPoint = Transform.mul(transform, segment.endControlPoint);
+        geo.transformVec2(segment.startControlPoint, transform, segment.startControlPoint);
+        geo.transformVec2(segment.endControlPoint, transform, segment.endControlPoint);
         break;
       case "QuadraticBezierCurve":
-        segment.controlPoint = Transform.mul(transform, segment.controlPoint);
+        geo.transformVec2(segment.controlPoint, transform, segment.controlPoint);
         break;
       case "EllipticalArcCurve":
         // TODO
@@ -51,12 +56,12 @@ export default function (factory: Factory, node: any, transform?: Transform): vo
   });
 }
 
-function convertLineSegment(node, factory: Factory, segment: LineSegment): void {
+function convertLineSegment(node: any, factory: Factory, segment: LineSegment): void {
   factory.edge(node, segment.startingPoint, segment.endPoint);
 }
 
 function convertQuadraticBezierCurveSegment(
-  node,
+  node: any,
   factory: Factory,
   s: QuadraticBezierCurveSegment,
 ): void {
@@ -67,18 +72,30 @@ function convertQuadraticBezierCurveSegment(
     Array(numberOfPoints)
       .fill(0)
       .map((_, index) => index / (numberOfPoints - 1))
-      .map((t) =>
-        Vec2.combine(
-          1 - t,
-          Vec2.combine(1 - t, s.startingPoint, t, s.controlPoint),
-          t,
-          Vec2.combine(1 - t, s.controlPoint, t, s.endPoint),
-        ),
-      ),
+      .map((t) => {
+        const mt = 1 - t;
+        const temp = geo.vec2(0, 0);
+        geo.combine4Vec2(
+          temp,
+          mt * mt,
+          s.startingPoint,
+          mt * t,
+          s.controlPoint,
+          t * mt,
+          s.controlPoint,
+          t * t,
+          s.endPoint,
+        );
+        return temp;
+      }),
   );
 }
 
-function convertCubicBezierCurveSegment(node, factory: Factory, s: CubicBezierCurveSegment): void {
+function convertCubicBezierCurveSegment(
+  node: any,
+  factory: Factory,
+  s: CubicBezierCurveSegment,
+): void {
   const numberOfPoints = 7; // TODO as param
   // De-Casteljau-algorithm
   factory.chain(
@@ -86,29 +103,27 @@ function convertCubicBezierCurveSegment(node, factory: Factory, s: CubicBezierCu
     Array(numberOfPoints)
       .fill(0)
       .map((_, index) => index / (numberOfPoints - 1))
-      .map((t) =>
-        Vec2.combine(
-          1 - t,
-          Vec2.combine(
-            1 - t,
-            Vec2.combine(1 - t, s.startingPoint, t, s.startControlPoint),
-            t,
-            Vec2.combine(1 - t, s.startControlPoint, t, s.endControlPoint),
-          ),
-          t,
-          Vec2.combine(
-            1 - t,
-            Vec2.combine(1 - t, s.startControlPoint, t, s.endControlPoint),
-            t,
-            Vec2.combine(1 - t, s.endControlPoint, t, s.endPoint),
-          ),
-        ),
-      ),
+      .map((t) => {
+        const mt = 1 - t;
+        const temp = geo.vec2(0, 0);
+        geo.combine4Vec2(
+          temp,
+          mt * mt * mt,
+          s.startingPoint,
+          3 * mt * mt * t,
+          s.startControlPoint,
+          3 * mt * t * t,
+          s.endControlPoint,
+          t * t * t,
+          s.endPoint,
+        );
+        return temp;
+      }),
   );
 }
 
 function convertEllipticalArcCurveSegment(
-  node,
+  node: any,
   factory: Factory,
   segment: EllipticalArcCurveSegment,
 ): void {

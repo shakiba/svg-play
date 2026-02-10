@@ -1,25 +1,32 @@
-import { Transform, Vec2 } from "planck";
+import * as geo from "../common/Geo";
 import { Factory } from "./factory";
 
-export default function (factory: Factory, node: any, transform?: Transform): void {
+export default function (factory: Factory, node: any, transform0?: geo.TransformValue): void {
   const numberOfPoints = 12; // TODO as param
 
-  let position = Vec2(node.$?.cx ?? 0, node.$?.cy ?? 0);
+  const xf = geo.transform(0, 0, 0);
+  if (transform0) geo.transformTransform(xf, xf, transform0);
+  if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);
 
-  let transformation = (position = [transform, node.$.transform, Transform(position, 0)]
-    .filter((a) => a)
-    .reduce(Transform.mul));
+  const position = geo.vec2(node.$?.cx ?? 0, node.$?.cy ?? 0);
+  geo.transformVec2(position, xf, position);
+
+  const transformation = geo.transform(position.x, position.y, 0);
+  geo.transformTransform(transformation, xf, transformation);
 
   let vertices = Array(numberOfPoints)
     .fill(0)
     .map((_, index) => (index / numberOfPoints) * 2 * Math.PI)
     .map((alpha) =>
-      Vec2(
+      geo.vec2(
         Math.cos(alpha) * (node.$?.rx ?? node.$?.ry ?? 0),
         Math.sin(alpha) * (node.$?.ry ?? node.$?.rx ?? 0),
       ),
     )
-    .map((p) => Transform.mul(transformation, p));
+    .map((p) => {
+      geo.transformVec2(p, transformation, p);
+      return p;
+    });
 
   factory.polygon(node, vertices);
 }

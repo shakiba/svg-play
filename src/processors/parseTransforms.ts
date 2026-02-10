@@ -1,5 +1,5 @@
+import * as geo from "../common/Geo";
 import { parseTransform } from "../parsers";
-import { Transform } from "planck";
 
 export default function parseTransforms(value: string, name: string) {
   if (name !== "transform") {
@@ -7,8 +7,8 @@ export default function parseTransforms(value: string, name: string) {
   }
   try {
     return parseTransform(value);
-  } catch (e) {
+  } catch (e: any) {
     console.warn(e.message); // TODO ok?
-    return Transform.identity();
+    return geo.transform(0, 0, 0);
   }
 }

@@ -115,7 +115,14 @@ export function plusVec3(out: Vec3Value, w: Vec3Value): void {
 /** Adds w and v and assigns the result to out, equivalent to out = v + w */
 export function addVec2(out: Vec2Value, v: Vec2Value, w: Vec2Value): void {
   out.x = v.x + w.x;
-  out.y = v.x + w.y;
+  out.y = v.y + w.y;
+}
+
+/** Adds w and v and assigns the result to out, equivalent to out = v + w */
+export function addVec3(out: Vec3Value, v: Vec3Value, w: Vec3Value): void {
+  out.x = v.x + w.x;
+  out.y = v.y + w.y;
+  out.z = v.z + w.z;
 }
 
 export function clampVec2(out: Vec2Value, max: number): void {
@@ -422,6 +429,21 @@ export function retransformVec2(
   const oy = -to.q.s * px + to.q.c * py;
   out.x = ox;
   out.y = oy;
+}
+
+export function transformTransform(
+  out: TransformValue,
+  a: TransformValue,
+  b: TransformValue,
+): void {
+  const c = a.q.c * b.q.c - a.q.s * b.q.s;
+  const s = a.q.s * b.q.c + a.q.c * b.q.s;
+  const ox = a.q.c * b.p.x - a.q.s * b.p.y + a.p.x;
+  const oy = a.q.s * b.p.x + a.q.c * b.p.y + a.p.y;
+  out.q.c = c;
+  out.q.s = s;
+  out.p.x = ox;
+  out.p.y = oy;
 }
 
 export function detransformTransform(

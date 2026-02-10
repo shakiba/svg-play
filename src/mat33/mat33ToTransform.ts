@@ -1,4 +1,4 @@
-import { Vec2, Vec3, Transform, Mat33 } from "planck";
+import * as geo from "../common/Geo";
 import { getAngle } from "../util";
 import mat33mul from "./mat33mul";
 
@@ -7,9 +7,9 @@ const EPSILON = 1e-3;
 /**
  * Returns a Transform T and an overhang B such that A = T * B
  */
-export default function mat33ToTransform(A: Mat33): {
-  transform: Transform;
-  overhang: Mat33 | null;
+export default function mat33ToTransform(A: geo.Mat33Value): {
+  transform: geo.TransformValue;
+  overhang: geo.Mat33Value | null;
 } {
   const {
     ex: { x: a, y: b },
@@ -26,19 +26,19 @@ export default function mat33ToTransform(A: Mat33): {
   const length = Math.hypot(a, b);
   const alpha = getAngle(Math.acos(a / length), Math.asin(b / length));
 
-  const transform = Transform(Vec2(e, f), alpha);
+  const transform = geo.transform(e, f, alpha);
 
   // B = T^{-1} * A
   const B = mat33mul(
-    new Mat33(
-      Vec3(Math.cos(alpha), -Math.sin(alpha), 0),
-      Vec3(Math.sin(alpha), Math.cos(alpha), 0),
-      Vec3(
+    {
+      ex: geo.vec3(Math.cos(alpha), -Math.sin(alpha), 0),
+      ey: geo.vec3(Math.sin(alpha), Math.cos(alpha), 0),
+      ez: geo.vec3(
         -f * Math.sin(alpha) - e * Math.cos(alpha),
         -f * Math.cos(alpha) + e * Math.sin(alpha),
         1,
       ),
-    ),
+    },
     A,
   );
 
@@ -48,7 +48,7 @@ export default function mat33ToTransform(A: Mat33): {
   };
 }
 
-function isAlmostIdentity(A: Mat33): boolean {
+function isAlmostIdentity(A: geo.Mat33Value): boolean {
   const {
     ex: { x: a, y: b },
     ey: { x: c, y: d },

@@ -1,13 +1,13 @@
-import { Mat33 } from "planck";
+import * as geo from "../common/Geo";
 import { mat33mul, mat33ToTransform, applyMat33ToShape } from ".";
 import { isShape } from "../util";
 
-export default function wringOutMat33(node: any, overhang: Mat33 | null) {
+export default function wringOutMat33(node: any, overhang: geo.Mat33Value | null) {
   if (isShape(node)) {
     applyMat33ToShape(node, overhang);
   } else if (node.$$) {
     if (node.$?.transform) {
-      let transform = <Mat33>node.$.transform;
+      let transform = <geo.Mat33Value>node.$.transform;
       if (overhang) {
         transform = mat33mul(overhang, transform);
       }
