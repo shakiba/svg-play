@@ -1,5 +1,12 @@
 # svg-play
 
+## 0.1.1
+
+### Patch Changes
+
+- 96b096e: Refactor exports
+- 3cb332e: Clean up transforms
+
 ## 0.1.0
 
 ### Minor Changes
