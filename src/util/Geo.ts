@@ -1,8 +1,3 @@
-/*
- * Copyright (c) Ali Shakiba
- * Licensed under the MIT License
- */
-
 export interface Vec2Value {
   x: number;
   y: number;
