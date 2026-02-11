@@ -1,6 +1,6 @@
-import { parsePath } from "../parsers";
+import { parsePath } from "../parsers/parsePath";
 
-export default function parsePaths(value: string, name: string) {
+export function parsePaths(value: string, name: string) {
   if (name !== "d") {
     return value;
   }

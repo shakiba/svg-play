@@ -1,6 +1,6 @@
 import * as geo from "../util/Geo";
 
-export default function mat33mul(A: geo.Mat33Value, B: geo.Mat33Value): geo.Mat33Value {
+export function mat33mul(A: geo.Mat33Value, B: geo.Mat33Value): geo.Mat33Value {
   const {
     ex: { x: a, y: b },
     ey: { x: c, y: d },

@@ -1,8 +1,10 @@
 import * as geo from "../util/Geo";
-import { mat33mul, mat33ToTransform, applyMat33ToShape } from ".";
-import { isShape } from "../util";
+import { isShape } from "../util/isShape";
+import { applyMat33ToShape } from "./applyMat33ToShape";
+import { mat33mul } from "./mat33mul";
+import { mat33ToTransform } from "./mat33ToTransform";
 
-export default function wringOutMat33(node: any, overhang: geo.Mat33Value | null) {
+export function wringOutMat33(node: any, overhang: geo.Mat33Value | null) {
   if (isShape(node)) {
     applyMat33ToShape(node, overhang);
   } else if (node.$$) {

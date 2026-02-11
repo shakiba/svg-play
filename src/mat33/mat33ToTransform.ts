@@ -1,13 +1,13 @@
 import * as geo from "../util/Geo";
-import { getAngle } from "../util";
-import mat33mul from "./mat33mul";
+import { getAngle } from "../util/getAngle";
+import { mat33mul } from "./mat33mul";
 
 const EPSILON = 1e-3;
 
 /**
  * Returns a Transform T and an overhang B such that A = T * B
  */
-export default function mat33ToTransform(A: geo.Mat33Value): {
+export function mat33ToTransform(A: geo.Mat33Value): {
   transform: geo.TransformValue;
   overhang: geo.Mat33Value | null;
 } {

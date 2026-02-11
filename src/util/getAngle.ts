@@ -1,4 +1,4 @@
-export default function getAngle(arccos: number, arcsin: number) {
+export function getAngle(arccos: number, arcsin: number) {
   if (arcsin >= 0) {
     return arccos;
   } else {

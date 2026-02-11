@@ -1,4 +1,4 @@
-import { parseNumberList } from ".";
+import { parseNumberList } from "./parseNumberList";
 
 type Letter =
   | "M"
@@ -59,7 +59,7 @@ function getImplictNextLetter(letter: Letter): Letter {
   return letter;
 }
 
-export default function parsePath(value: string): Command[] {
+export function parsePath(value: string): Command[] {
   let result = [] as { letter: Letter; parameters: number[] }[];
   let commands = value.match(/[MmLlHhVvCcSsQqTtAaZz][^MmLlHhVvCcSsQqTtAaZz]*/g);
 

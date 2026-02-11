@@ -1,26 +1,19 @@
-export * as processors from "./processors";
-export * as parsers from "./parsers";
-export * as util from "./util";
-export * as converters from "./converters";
-
-export * from "./converters/factory";
-
 import * as geo from "./util/Geo";
 import { parseStringPromise, processors, OptionsV2 } from "xml2js";
-import {
-  parseTransforms,
-  squashTransforms,
-  parsePoints,
-  parsePaths,
-  interpretPaths,
-} from "./processors";
-import { wringOutMat33 } from "./mat33";
+import { wringOutMat33 } from "./mat33/wringOutMat33";
 import { Factory, transformTree } from "./converters/factory";
+import { parseTransforms } from "./processors/parseTransforms";
+import { squashTransforms } from "./processors/squashTransforms";
+import { parsePoints } from "./processors/parsePoints";
+import { parsePaths } from "./processors/parsePaths";
+import { interpretPaths } from "./processors/interpretPaths";
+
+export { type Factory } from "./converters/factory";
 
 export type Options = {
   meterPerPixelRatio?: number;
   scaleY?: number;
-  transform?: geo.TransformValue;
+  transform?: { p: { x: number; y: number }; q: { c: number; s: number } };
 } & Omit<
   Omit<Omit<Omit<OptionsV2, "attrkey">, "explicitChildren">, "preserveChildrenOrder">,
   "explicitRoot"

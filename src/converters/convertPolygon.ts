@@ -1,7 +1,7 @@
 import * as geo from "../util/Geo";
 import { Factory } from "./factory";
 
-export default function (factory: Factory, node: any, transform0?: geo.TransformValue): void {
+export function convertPolygon(factory: Factory, node: any, transform0?: geo.TransformValue): void {
   const xf = geo.transform(0, 0, 0);
   if (transform0) geo.transformTransform(xf, xf, transform0);
   if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);

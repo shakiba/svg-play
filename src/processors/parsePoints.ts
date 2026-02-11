@@ -1,7 +1,7 @@
+import { parseNumberList } from "../parsers/parseNumberList";
 import * as geo from "../util/Geo";
-import { parseNumberList } from "../parsers";
 
-export default function parsePoints(value: string, name: string) {
+export function parsePoints(value: string, name: string) {
   if (name !== "points") {
     return value;
   }

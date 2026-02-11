@@ -1,11 +1,12 @@
 import * as geo from "../util/Geo";
-import { mat33mul, mat33ToTransform } from ".";
 import { PathSegment } from "../parsers/interpretPath";
-import { getAngle } from "../util";
+import { getAngle } from "../util/getAngle";
+import { mat33ToTransform } from "./mat33ToTransform";
+import { mat33mul } from "./mat33mul";
 
 const EPSILON = 1e-1;
 
-export default function applyMat33ToShape(node: any, A: geo.Mat33Value | null) {
+export function applyMat33ToShape(node: any, A: geo.Mat33Value | null) {
   if (!A) {
     return;
   }

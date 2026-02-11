@@ -1,7 +1,7 @@
+import { parseTransform } from "../parsers/parseTransform";
 import * as geo from "../util/Geo";
-import { parseTransform } from "../parsers";
 
-export default function parseTransforms(value: string, name: string) {
+export function parseTransforms(value: string, name: string) {
   if (name !== "transform") {
     return value;
   }

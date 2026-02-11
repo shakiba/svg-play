@@ -12,7 +12,7 @@ type Transform = geo.TransformValue;
 
 // TODO set ghost vertices
 
-export default function (factory: Factory, node: any, transform0?: Transform): void {
+export function convertPath(factory: Factory, node: any, transform0?: Transform): void {
   const xf = geo.transform(0, 0, 0);
   if (transform0) geo.transformTransform(xf, xf, transform0);
   if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);

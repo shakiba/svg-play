@@ -1,22 +1,26 @@
 import * as geo from "../util/Geo";
 
-import { isShape } from "../util";
-import {
-  convertCircle,
-  convertLine,
-  convertPolygon,
-  convertPolyline,
-  convertRect,
-} from "../converters";
-import convertEllipse from "../converters/convertEllipse";
-import convertPath from "../converters/convertPath";
+import { isShape } from "../util/isShape";
+import { convertCircle } from "./convertCircle";
+import { convertEllipse } from "./convertEllipse";
+import { convertLine } from "./convertLine";
+import { convertPath } from "./convertPath";
+import { convertPolygon } from "./convertPolygon";
+import { convertPolyline } from "./convertPolyline";
+import { convertRect } from "./convertRect";
 
 export interface Factory {
-  polygon: (node: any, vertices: geo.Vec2Value[]) => void;
-  circle: (node: any, p: geo.Vec2Value, radius: number) => void;
-  chain: (node: any, points: geo.Vec2Value[]) => void;
-  edge: (node: any, p1: geo.Vec2Value, p2: geo.Vec2Value) => void;
-  box: (node: any, width: number, height: number, center: geo.Vec2Value, angle: number) => void;
+  polygon: (node: any, vertices: { x: number; y: number }[]) => void;
+  circle: (node: any, p: { x: number; y: number }, radius: number) => void;
+  chain: (node: any, points: { x: number; y: number }[]) => void;
+  edge: (node: any, p1: { x: number; y: number }, p2: { x: number; y: number }) => void;
+  box: (
+    node: any,
+    width: number,
+    height: number,
+    center: { x: number; y: number },
+    angle: number,
+  ) => void;
 }
 
 export function transformTree(factory: Factory, node: any, transform0 = geo.transform(0, 0, 0)) {

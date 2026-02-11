@@ -1,7 +1,7 @@
 import * as geo from "../util/Geo";
-import parseNumberList from "./parseNumberList";
+import { parseNumberList } from "./parseNumberList";
 
-export default function parseTransform(value: string): geo.Mat33Value[] {
+export function parseTransform(value: string): geo.Mat33Value[] {
   const errorMsg = `Unexpected value '${value}' for transform attribute`;
 
   // TODO validation (we currently accept invalid transforms)

@@ -1,6 +1,6 @@
-import { interpretPath } from "../parsers";
+import { interpretPath } from "../parsers/interpretPath";
 
-export default function interpretPaths(value: any, name: string) {
+export function interpretPaths(value: any, name: string) {
   if (name !== "d") {
     return value;
   }

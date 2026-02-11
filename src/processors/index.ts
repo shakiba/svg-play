@@ -1,5 +1,0 @@
-export { default as parseTransforms } from "./parseTransforms";
-export { default as parsePoints } from "./parsePoints";
-export { default as squashTransforms } from "./squashTransforms";
-export { default as parsePaths } from "./parsePaths";
-export { default as interpretPaths } from "./interpretPaths";

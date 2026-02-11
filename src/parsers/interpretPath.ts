@@ -35,7 +35,7 @@ export type PathSegment =
   | QuadraticBezierCurveSegment
   | EllipticalArcCurveSegment;
 
-export default function interpretPath(commands: Command[]): PathSegment[] {
+export function interpretPath(commands: Command[]): PathSegment[] {
   let result = [] as PathSegment[];
 
   let start = commands.shift();

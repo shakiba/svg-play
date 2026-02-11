@@ -1,7 +1,7 @@
 import * as geo from "../util/Geo";
 import { Factory } from "./factory";
 
-export default function (factory: Factory, node: any, transform0?: geo.TransformValue): void {
+export function convertEllipse(factory: Factory, node: any, transform0?: geo.TransformValue): void {
   const numberOfPoints = 16; // TODO as param
 
   const xf = geo.transform(0, 0, 0);
