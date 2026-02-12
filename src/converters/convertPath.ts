@@ -20,17 +20,25 @@ export function convertPath(factory: Factory, node: any, transform0?: Transform)
   if (!node.$?.d) {
     return;
   }
+
+  const vertices: geo.Vec2Value[] = [];
+
   for (let segment of node.$.d as PathSegment[]) {
     geo.transformVec2(segment.startingPoint, xf, segment.startingPoint);
     geo.transformVec2(segment.endPoint, xf, segment.endPoint);
 
     switch (segment.type) {
-      case "CubicBezierCurve":
-        geo.transformVec2(segment.startControlPoint, xf, segment.startControlPoint);
-        geo.transformVec2(segment.endControlPoint, xf, segment.endControlPoint);
+      case "Line":
+        vertices.push(segment.startingPoint, segment.endPoint);
         break;
       case "QuadraticBezierCurve":
         geo.transformVec2(segment.controlPoint, xf, segment.controlPoint);
+        vertices.push(...convertQuadraticBezierCurveSegment(segment));
+        break;
+      case "CubicBezierCurve":
+        geo.transformVec2(segment.startControlPoint, xf, segment.startControlPoint);
+        geo.transformVec2(segment.endControlPoint, xf, segment.endControlPoint);
+        vertices.push(...convertCubicBezierCurveSegment(segment));
         break;
       case "EllipticalArcCurve":
         // TODO
@@ -39,91 +47,60 @@ export function convertPath(factory: Factory, node: any, transform0?: Transform)
     }
   }
 
-  (<PathSegment[]>node.$.d).map((segment) => {
-    switch (segment.type) {
-      case "Line":
-        return convertLineSegment(node, factory, segment);
-      case "QuadraticBezierCurve":
-        return convertQuadraticBezierCurveSegment(node, factory, segment);
-      case "CubicBezierCurve":
-        return convertCubicBezierCurveSegment(node, factory, segment);
-      case "EllipticalArcCurve":
-        return convertEllipticalArcCurveSegment(node, factory, segment);
-    }
-  });
+  if (vertices.length === 2) {
+    factory.edge(node, vertices[0], vertices[1]);
+  } else if (vertices.length > 2) {
+    factory.chain(node, vertices);
+  }
 }
 
-function convertLineSegment(node: any, factory: Factory, segment: LineSegment): void {
-  factory.edge(node, segment.startingPoint, segment.endPoint);
-}
-
-function convertQuadraticBezierCurveSegment(
-  node: any,
-  factory: Factory,
-  s: QuadraticBezierCurveSegment,
-): void {
-  const numberOfPoints = 7; // TODO as param
+function convertQuadraticBezierCurveSegment(s: QuadraticBezierCurveSegment, numberOfPoints = 7) {
+  const vertices: geo.Vec2Value[] = [];
   // De-Casteljau-algorithm
-  factory.chain(
-    node,
-    Array(numberOfPoints)
-      .fill(0)
-      .map((_, index) => index / (numberOfPoints - 1))
-      .map((t) => {
-        const mt = 1 - t;
-        const temp = geo.vec2(0, 0);
-        geo.combine4Vec2(
-          temp,
-          mt * mt,
-          s.startingPoint,
-          mt * t,
-          s.controlPoint,
-          t * mt,
-          s.controlPoint,
-          t * t,
-          s.endPoint,
-        );
-        return temp;
-      }),
-  );
+  for (let i = 0; i < numberOfPoints; i++) {
+    const t = i / (numberOfPoints - 1);
+    const mt = 1 - t;
+    const vertex = geo.vec2(0, 0);
+    geo.combine4Vec2(
+      vertex,
+      mt * mt,
+      s.startingPoint,
+      mt * t,
+      s.controlPoint,
+      t * mt,
+      s.controlPoint,
+      t * t,
+      s.endPoint,
+    );
+    vertices.push(vertex);
+  }
+  return vertices;
 }
 
-function convertCubicBezierCurveSegment(
-  node: any,
-  factory: Factory,
-  s: CubicBezierCurveSegment,
-): void {
-  const numberOfPoints = 7; // TODO as param
+function convertCubicBezierCurveSegment(s: CubicBezierCurveSegment, numberOfPoints = 7) {
   // De-Casteljau-algorithm
-  factory.chain(
-    node,
-    Array(numberOfPoints)
-      .fill(0)
-      .map((_, index) => index / (numberOfPoints - 1))
-      .map((t) => {
-        const mt = 1 - t;
-        const temp = geo.vec2(0, 0);
-        geo.combine4Vec2(
-          temp,
-          mt * mt * mt,
-          s.startingPoint,
-          3 * mt * mt * t,
-          s.startControlPoint,
-          3 * mt * t * t,
-          s.endControlPoint,
-          t * t * t,
-          s.endPoint,
-        );
-        return temp;
-      }),
-  );
+  const vertices: geo.Vec2Value[] = [];
+  for (let i = 0; i < numberOfPoints; i++) {
+    const t = i / (numberOfPoints - 1);
+    const mt = 1 - t;
+    const vertex = geo.vec2(0, 0);
+    geo.combine4Vec2(
+      vertex,
+      mt * mt * mt,
+      s.startingPoint,
+      3 * mt * mt * t,
+      s.startControlPoint,
+      3 * mt * t * t,
+      s.endControlPoint,
+      t * t * t,
+      s.endPoint,
+    );
+    vertices.push(vertex);
+  }
+  return vertices;
 }
 
-function convertEllipticalArcCurveSegment(
-  node: any,
-  factory: Factory,
-  segment: EllipticalArcCurveSegment,
-): void {
-  // TODO
-  factory.chain(node, []);
+function convertEllipticalArcCurveSegment(segment: EllipticalArcCurveSegment) {
+  // todo
+  return [];
 }
