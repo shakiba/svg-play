@@ -96,7 +96,7 @@ export function parsePath(value: string): Command[] {
 
       if (parameters.length !== 0) {
         // keep path until this point
-        break;
+        // break;
       }
     }
   } catch {
