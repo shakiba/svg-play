@@ -1,5 +1,11 @@
 # svg-play
 
+## 0.1.5
+
+### Patch Changes
+
+- 81acccf: Fix transform option, remove other scale options
+
 ## 0.1.4
 
 ### Patch Changes
