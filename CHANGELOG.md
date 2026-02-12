@@ -1,5 +1,11 @@
 # svg-play
 
+## 0.1.3
+
+### Patch Changes
+
+- db57cad: Use transformation matrix
+
 ## 0.1.2
 
 ### Patch Changes
