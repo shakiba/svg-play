@@ -1,5 +1,12 @@
 # svg-play
 
+## 0.1.2
+
+### Patch Changes
+
+- 01e24e3: Merge path segments into one shape
+- a175d85: Fix parsing path with exponent number
+
 ## 0.1.1
 
 ### Patch Changes
