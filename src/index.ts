@@ -1,12 +1,11 @@
-import * as geo from "./util/Geo";
 import { parseStringPromise, processors, OptionsV2 } from "xml2js";
-import { wringOutMat33 } from "./mat33/wringOutMat33";
 import { Factory, transformTree } from "./converters/factory";
 import { parseTransforms } from "./processors/parseTransforms";
 import { squashTransforms } from "./processors/squashTransforms";
 import { parsePoints } from "./processors/parsePoints";
 import { parsePaths } from "./processors/parsePaths";
 import { interpretPaths } from "./processors/interpretPaths";
+import { Matrix } from "./util/Matrix";
 
 export { type Factory } from "./converters/factory";
 
@@ -37,16 +36,18 @@ export async function svgFactory(svg: string, factory: Factory, options: Options
     ],
   });
 
-  const scale = options.meterPerPixelRatio ?? 1;
-  const scaleY = options.scaleY ?? 1;
-  const A =
-    scale !== 1 || scaleY !== 1
-      ? { ex: geo.vec3(scale, 0, 0), ey: geo.vec3(0, scale * scaleY, 0), ez: geo.vec3(0, 0, 1) }
-      : null;
+  const xf = new Matrix()
+  if (typeof options.meterPerPixelRatio === "number" || options.meterPerPixelRatio !== 1) {
+    const scale = options.meterPerPixelRatio as number;
+    xf.scale(scale, scale);
+  }
 
-  wringOutMat33(rootNode, A);
+  if (typeof options.scaleY === "number" || options.scaleY !== 1) {
+    const scaleY = options.scaleY as number;
+    xf.scale(1, scaleY);
+  }
 
-  transformTree(factory, rootNode, options.transform);
+  transformTree(factory, rootNode, xf);
 
   return rootNode;
 }

@@ -1,33 +1,33 @@
-import * as geo from "../util/Geo";
+import { Vec2Value } from "../util/Matrix";
 import { Command } from "./parsePath";
 
 export type LineSegment = {
   type: "Line";
-  startingPoint: geo.Vec2Value;
-  endPoint: geo.Vec2Value;
+  startingPoint: Vec2Value;
+  endPoint: Vec2Value;
 };
 export type CubicBezierCurveSegment = {
   type: "CubicBezierCurve";
-  startingPoint: geo.Vec2Value;
-  endPoint: geo.Vec2Value;
-  startControlPoint: geo.Vec2Value;
-  endControlPoint: geo.Vec2Value;
+  startingPoint: Vec2Value;
+  endPoint: Vec2Value;
+  startControlPoint: Vec2Value;
+  endControlPoint: Vec2Value;
 };
 export type QuadraticBezierCurveSegment = {
   type: "QuadraticBezierCurve";
-  startingPoint: geo.Vec2Value;
-  endPoint: geo.Vec2Value;
-  controlPoint: geo.Vec2Value;
+  startingPoint: Vec2Value;
+  endPoint: Vec2Value;
+  controlPoint: Vec2Value;
 };
 export type EllipticalArcCurveSegment = {
   type: "EllipticalArcCurve";
-  startingPoint: geo.Vec2Value;
+  startingPoint: Vec2Value;
   rx: number;
   ry: number;
   angle: number;
   largeArcFlag: 0 | 1;
   sweepFlag: 0 | 1;
-  endPoint: geo.Vec2Value;
+  endPoint: Vec2Value;
 };
 export type PathSegment =
   | LineSegment
@@ -43,20 +43,21 @@ export function interpretPath(commands: Command[]): PathSegment[] {
     return [];
   }
 
-  let currentPoint = geo.vec2(start.parameters[0], start.parameters[1]);
+  let currentPoint = { x: start.parameters[0], y: start.parameters[1] };
   let cubicStartControlPoint = currentPoint;
   let quadraticControlPoint = currentPoint;
   let initialPoint = currentPoint;
 
   for (let command of commands) {
-    let endPoint: geo.Vec2Value;
-    let endControlPoint: geo.Vec2Value;
+    let endPoint: Vec2Value;
+    let endControlPoint: Vec2Value;
     switch (command.letter) {
       case "M":
       case "m":
-        endPoint = geo.vec2(command.parameters[0], command.parameters[1]);
+        endPoint = { x: command.parameters[0], y: command.parameters[1] };
         if (isLowerCase(command.letter)) {
-          geo.addVec2(endPoint, endPoint, currentPoint);
+          endPoint.x += currentPoint.x;
+          endPoint.y += currentPoint.y;
         }
         currentPoint = endPoint;
         cubicStartControlPoint = endPoint;
@@ -73,8 +74,8 @@ export function interpretPath(commands: Command[]): PathSegment[] {
         endPoint = getAbsoluteLineEndPoint(command, currentPoint);
         result.push({
           type: "Line",
-          startingPoint: geo.vec2(currentPoint.x, currentPoint.y),
-          endPoint: geo.vec2(endPoint.x, endPoint.y),
+          startingPoint: { x: currentPoint.x, y: currentPoint.y },
+          endPoint: { x: endPoint.x, y: endPoint.y },
         });
         currentPoint = endPoint;
         cubicStartControlPoint = endPoint;
@@ -83,67 +84,79 @@ export function interpretPath(commands: Command[]): PathSegment[] {
 
       case "C":
       case "c":
-        cubicStartControlPoint = geo.vec2(command.parameters[0], command.parameters[1]);
+        cubicStartControlPoint = { x: command.parameters[0], y: command.parameters[1] };
         if (isLowerCase(command.letter)) {
-          geo.addVec2(cubicStartControlPoint, cubicStartControlPoint, currentPoint);
+          cubicStartControlPoint.x += currentPoint.x;
+          cubicStartControlPoint.y += currentPoint.y;
         }
         command.parameters = command.parameters.slice(2);
       /* FALLTHROUGH */
       case "S":
       case "s":
-        endControlPoint = geo.vec2(command.parameters[0], command.parameters[1]);
-        endPoint = geo.vec2(command.parameters[2], command.parameters[3]);
+        endControlPoint = { x: command.parameters[0], y: command.parameters[1] };
+        endPoint = { x: command.parameters[2], y: command.parameters[3] };
         if (isLowerCase(command.letter)) {
-          geo.addVec2(endControlPoint, endControlPoint, currentPoint);
-          geo.addVec2(endPoint, endPoint, currentPoint);
+          endControlPoint.x += currentPoint.x;
+          endControlPoint.y += currentPoint.y;
+          endPoint.x += currentPoint.x;
+          endPoint.y += currentPoint.y;
         }
         result.push({
           type: "CubicBezierCurve",
-          startingPoint: geo.vec2(currentPoint.x, currentPoint.y),
-          startControlPoint: geo.vec2(cubicStartControlPoint.x, cubicStartControlPoint.y),
-          endControlPoint: geo.vec2(endControlPoint.x, endControlPoint.y),
-          endPoint: geo.vec2(endPoint.x, endPoint.y),
+          startingPoint: { x: currentPoint.x, y: currentPoint.y },
+          startControlPoint: { x: cubicStartControlPoint.x, y: cubicStartControlPoint.y },
+          endControlPoint: { x: endControlPoint.x, y: endControlPoint.y },
+          endPoint: { x: endPoint.x, y: endPoint.y },
         });
         currentPoint = endPoint;
         // reflection of cubicStartControlPoint as endPoint
-        geo.combine2Vec2(cubicStartControlPoint, 2, endPoint, -1, cubicStartControlPoint);
+        cubicStartControlPoint = {
+          x: 2 * endPoint.x - cubicStartControlPoint.x,
+          y: 2 * endPoint.y - cubicStartControlPoint.y,
+        };
         quadraticControlPoint = endPoint;
         break;
 
       case "Q":
       case "q":
-        quadraticControlPoint = geo.vec2(command.parameters[0], command.parameters[1]);
+        quadraticControlPoint = { x: command.parameters[0], y: command.parameters[1] };
         if (isLowerCase(command.letter)) {
-          geo.addVec2(quadraticControlPoint, quadraticControlPoint, currentPoint);
+          quadraticControlPoint.x += currentPoint.x;
+          quadraticControlPoint.y += currentPoint.y;
         }
         command.parameters = command.parameters.slice(2);
       /* FALLTHROUGH */
       case "T":
       case "t":
-        endPoint = geo.vec2(command.parameters[0], command.parameters[1]);
+        endPoint = { x: command.parameters[0], y: command.parameters[1] };
         if (isLowerCase(command.letter)) {
-          geo.addVec2(endPoint, endPoint, currentPoint);
+          endPoint.x += currentPoint.x;
+          endPoint.y += currentPoint.y;
         }
         result.push({
           type: "QuadraticBezierCurve",
-          startingPoint: geo.vec2(currentPoint.x, currentPoint.y),
-          controlPoint: geo.vec2(quadraticControlPoint.x, quadraticControlPoint.y),
-          endPoint: geo.vec2(endPoint.x, endPoint.y),
+          startingPoint: { x: currentPoint.x, y: currentPoint.y },
+          controlPoint: { x: quadraticControlPoint.x, y: quadraticControlPoint.y },
+          endPoint: { x: endPoint.x, y: endPoint.y },
         });
         currentPoint = endPoint;
         cubicStartControlPoint = endPoint;
-        geo.combine2Vec2(quadraticControlPoint, 2, endPoint, -1, quadraticControlPoint);
+        quadraticControlPoint = {
+          x: 2 * endPoint.x - quadraticControlPoint.x,
+          y: 2 * endPoint.y - quadraticControlPoint.y,
+        };
         break;
 
       case "A":
       case "a":
-        endPoint = geo.vec2(command.parameters[5], command.parameters[6]);
+        endPoint = { x: command.parameters[5], y: command.parameters[6] };
         if (isLowerCase(command.letter)) {
-          geo.addVec2(endPoint, endPoint, currentPoint);
+          endPoint.x += currentPoint.x;
+          endPoint.y += currentPoint.y;
         }
         result.push({
           type: "EllipticalArcCurve",
-          startingPoint: geo.vec2(currentPoint.x, currentPoint.y),
+          startingPoint: { x: currentPoint.x, y: currentPoint.y },
           rx: command.parameters[0],
           ry: command.parameters[1],
           angle: command.parameters[2],
@@ -160,8 +173,8 @@ export function interpretPath(commands: Command[]): PathSegment[] {
       case "z":
         result.push({
           type: "Line",
-          startingPoint: geo.vec2(currentPoint.x, currentPoint.y),
-          endPoint: geo.vec2(initialPoint.x, initialPoint.y),
+          startingPoint: { x: currentPoint.x, y: currentPoint.y },
+          endPoint: { x: initialPoint.x, y: initialPoint.y },
         });
         currentPoint = initialPoint;
         cubicStartControlPoint = initialPoint;
@@ -177,28 +190,29 @@ function isLowerCase(letter: String) {
   return letter === letter.toLowerCase();
 }
 
-function getAbsoluteLineEndPoint(command: Command, currentPoint: geo.Vec2Value): geo.Vec2Value {
-  let point: geo.Vec2Value;
+function getAbsoluteLineEndPoint(command: Command, currentPoint: Vec2Value): Vec2Value {
+  let point: Vec2Value = { x: 0, y: 0 };
   switch (command.letter) {
     case "L":
     case "l":
-      point = geo.vec2(command.parameters[0], command.parameters[1]);
+      point = { x: command.parameters[0], y: command.parameters[1] };
       break;
     case "H":
-      point = geo.vec2(command.parameters[0], currentPoint.y);
+      point = { x: command.parameters[0], y: currentPoint.y };
       break;
     case "h":
-      point = geo.vec2(command.parameters[0], 0);
+      point = { x: command.parameters[0], y: 0 };
       break;
     case "V":
-      point = geo.vec2(currentPoint.x, command.parameters[0]);
+      point = { x: currentPoint.x, y: command.parameters[0] };
       break;
     case "v":
-      point = geo.vec2(0, command.parameters[0]);
+      point = { x: 0, y: command.parameters[0] };
       break;
   }
   if (isLowerCase(command.letter)) {
-    geo.addVec2(point!, point!, currentPoint);
+    point.x += currentPoint.x;
+    point.y += currentPoint.y;
   }
-  return point!;
+  return point;
 }

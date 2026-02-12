@@ -1,5 +1,5 @@
 import { parseTransform } from "../parsers/parseTransform";
-import * as geo from "../util/Geo";
+import { Matrix } from "../util/Matrix";
 
 export function parseTransforms(value: string, name: string) {
   if (name !== "transform") {
@@ -9,6 +9,6 @@ export function parseTransforms(value: string, name: string) {
     return parseTransform(value);
   } catch (e: any) {
     console.warn(e.message); // TODO ok?
-    return geo.transform(0, 0, 0);
+    return new Matrix();
   }
 }

@@ -1,15 +1,15 @@
 import { parseNumberList } from "../parsers/parseNumberList";
-import * as geo from "../util/Geo";
+import { Vec2Value } from "../util/Matrix";
 
 export function parsePoints(value: string, name: string) {
   if (name !== "points") {
     return value;
   }
   const coordinates = parseNumberList(value);
-  const points = [] as geo.Vec2Value[];
+  const points = [] as Vec2Value[];
 
   for (let i = 1; i < coordinates.length; i += 2) {
-    points.push(geo.vec2(coordinates[i - 1], coordinates[i]));
+    points.push({ x: coordinates[i - 1], y: coordinates[i] });
   }
 
   return points;

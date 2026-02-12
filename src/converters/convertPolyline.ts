@@ -1,15 +1,11 @@
-import * as geo from "../util/Geo";
+import { Matrix, Vec2Value } from "../util/Matrix";
 import { Factory } from "./factory";
 
-export function convertPolyline(factory: Factory, node: any, transform0?: geo.TransformValue): void {
-  const xf = geo.transform(0, 0, 0);
-  if (transform0) geo.transformTransform(xf, xf, transform0);
-  if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);
-
-  let points = (node.$?.points ?? []) as geo.Vec2Value[];
+export function convertPolyline(factory: Factory, node: any, xf: Matrix): void {
+  let points = (node.$?.points ?? []) as Vec2Value[];
   points = points.map((point) => {
-    const p = geo.vec2(point.x, point.y);
-    geo.transformVec2(p, xf, p);
+    const p = { x: point.x, y: point.y };
+    xf.map(p, p);
     return p;
   });
 

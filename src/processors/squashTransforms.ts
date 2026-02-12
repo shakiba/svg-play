@@ -1,9 +1,8 @@
-import { mat33mul } from "../mat33/mat33mul";
-import * as geo from "../util/Geo";
+import { Matrix } from "../util/Matrix";
 
-export function squashTransforms(value: geo.Mat33Value[], name: string) {
+export function squashTransforms(value: Matrix[], name: string) {
   if (name !== "transform") {
     return value;
   }
-  return value.reduce(mat33mul);
+  return value.reverse().reduce((result, mat) => result.concat(mat), new Matrix());
 }

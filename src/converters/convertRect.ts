@@ -1,15 +1,22 @@
-import * as geo from "../util/Geo";
-import { getAngle } from "../util/getAngle";
+import { Matrix } from "../util/Matrix";
 import { Factory } from "./factory";
 
-export function convertRect(factory: Factory, node: any, transform0?: geo.TransformValue): void {
-  const xf = geo.transform(0, 0, 0);
-  if (transform0) geo.transformTransform(xf, xf, transform0);
-  if (node.$.transform) geo.transformTransform(xf, xf, node.$.transform);
+export function convertRect(factory: Factory, node: any, xf: Matrix): void {
+  const width = node.$.width ?? 0;
+  const height = node.$.height ?? 0;
+  const x = node.$.x ?? 0;
+  const y = node.$.y ?? 0;
 
-  let center = geo.vec2((node.$.x ?? 0) + node.$.width / 2, (node.$.y ?? 0) + node.$.height / 2);
-  geo.transformVec2(center, xf, center);
-  let angle = getAngle(Math.acos(xf.q.c), Math.asin(xf.q.s));
+  let vertices = [
+    { x: x, y: y },
+    { x: x + width, y: y },
+    { x: x + width, y: y + height },
+    { x: x, y: y + height },
+  ];
 
-  factory.box(node, node.$.width, node.$.height, center, angle);
+  vertices.map((point) => {
+    xf.map(point, point);
+  });
+
+  factory.polygon(node, vertices);
 }

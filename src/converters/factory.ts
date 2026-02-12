@@ -1,6 +1,5 @@
-import * as geo from "../util/Geo";
-
 import { isShape } from "../util/isShape";
+import { Matrix } from "../util/Matrix";
 import { convertCircle } from "./convertCircle";
 import { convertEllipse } from "./convertEllipse";
 import { convertLine } from "./convertLine";
@@ -23,31 +22,32 @@ export interface Factory {
   ) => void;
 }
 
-export function transformTree(factory: Factory, node: any, transform0 = geo.transform(0, 0, 0)) {
-  if (isShape(node)) {
+export function transformTree(factory: Factory, node: any, transform0?: Matrix) {
+    const xf = new Matrix();
+    if (node.$?.transform) xf.concat(node.$.transform);
+    if (transform0) xf.concat(transform0);
+
+    if (isShape(node)) {
     switch (node["#name"].toLowerCase()) {
       case "circle":
-        return convertCircle(factory, node, transform0);
+        return convertCircle(factory, node, xf);
       case "ellipse":
-        return convertEllipse(factory, node, transform0);
+        return convertEllipse(factory, node, xf);
       case "line":
-        return convertLine(factory, node, transform0);
+        return convertLine(factory, node, xf);
       case "path":
-        return convertPath(factory, node, transform0);
+        return convertPath(factory, node, xf);
       case "polygon":
-        return convertPolygon(factory, node, transform0);
+        return convertPolygon(factory, node, xf);
       case "polyline":
-        return convertPolyline(factory, node, transform0);
+        return convertPolyline(factory, node, xf);
       case "rect":
-        return convertRect(factory, node, transform0);
+        return convertRect(factory, node, xf);
       default:
         // invalid shape type, ignore
         return [];
     }
   } else if (node.$$) {
-    const xf = geo.transform(0, 0, 0);
-    if (transform0) geo.transformTransform(xf, xf, transform0);
-    if (node.$?.transform) geo.transformTransform(xf, xf, node.$.transform);
 
     for (let child of node.$$) {
       transformTree(factory, child, xf);
