@@ -10,9 +10,8 @@ import { Matrix } from "./util/Matrix";
 export { type Factory } from "./converters/factory";
 
 export type Options = {
-  meterPerPixelRatio?: number;
-  scaleY?: number;
-  transform?: { p: { x: number; y: number }; q: { c: number; s: number } };
+  /** 2d transform matrix */
+  transform?: { a: number; b: number; c: number; d: number; e: number; f: number };
 } & Omit<
   Omit<Omit<Omit<OptionsV2, "attrkey">, "explicitChildren">, "preserveChildrenOrder">,
   "explicitRoot"
@@ -36,15 +35,22 @@ export async function svgFactory(svg: string, factory: Factory, options: Options
     ],
   });
 
-  const xf = new Matrix()
-  if (typeof options.meterPerPixelRatio === "number" || options.meterPerPixelRatio !== 1) {
-    const scale = options.meterPerPixelRatio as number;
-    xf.scale(scale, scale);
+  const xf = new Matrix();
+
+  // deprecated option
+  const meterPerPixel = (options as any)["meterPerPixelRatio"];
+  if (typeof meterPerPixel === "number") {
+    xf.scale(meterPerPixel, meterPerPixel);
   }
 
-  if (typeof options.scaleY === "number" || options.scaleY !== 1) {
-    const scaleY = options.scaleY as number;
+  // deprecated option
+  const scaleY = (options as any)["scaleY"];
+  if (typeof scaleY === "number") {
     xf.scale(1, scaleY);
+  }
+
+  if (options.transform) {
+    xf.concat(options.transform);
   }
 
   transformTree(factory, rootNode, xf);
