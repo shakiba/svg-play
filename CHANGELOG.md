@@ -1,5 +1,11 @@
 # svg-play
 
+## 0.1.4
+
+### Patch Changes
+
+- 44176aa: Implement EllipticalArcCurve
+
 ## 0.1.3
 
 ### Patch Changes
